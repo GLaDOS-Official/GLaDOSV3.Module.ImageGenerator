@@ -16,6 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove=".git" />
+    <None Remove=".gitignore" />
+    <None Remove="GLaDOSV3.Module.ImageGenerator.csproj.DotSettings" />
     <None Remove="ImageGeneratorModule.cs~RF283580b.TMP" />
   </ItemGroup>
 

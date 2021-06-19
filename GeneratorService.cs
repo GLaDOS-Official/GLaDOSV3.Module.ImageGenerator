@@ -117,10 +117,10 @@ namespace GLaDOSV3.Module.ImageGeneration
             try
             {
                 if (user2 == null) user2 = context.Client.CurrentUser;
-                string user1_url = (user1.GetAvatarUrl() ?? user1.GetDefaultAvatarUrl()).Replace(".gif", ".png");
-                string user2_url = (user2.GetAvatarUrl() ?? user2.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+                string user1Url = (user1.GetAvatarUrl() ?? user1.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+                string user2Url = (user2.GetAvatarUrl() ?? user2.GetDefaultAvatarUrl()).Replace(".gif", ".png");
                 using HttpClient hc = new HttpClient();
-                byte[] jpgBytes = hc.GetByteArrayAsync($"https://nekobot.xyz/api/imagegen?user1={user1_url}&user2={user2_url}&type=ship&raw=1").GetAwaiter().GetResult();
+                byte[] jpgBytes = hc.GetByteArrayAsync($"https://nekobot.xyz/api/imagegen?user1={user1Url}&user2={user2Url}&type=ship&raw=1").GetAwaiter().GetResult();
                 return Task.FromResult(new MemoryStream(jpgBytes));
             }
             finally
@@ -148,10 +148,10 @@ namespace GLaDOSV3.Module.ImageGeneration
             try
             {
                 if (user2 == null) user2 = context.Client.CurrentUser;
-                string user1_url = (user1.GetAvatarUrl() ?? user1.GetDefaultAvatarUrl()).Replace(".gif", ".png");
-                string user2_url = (user2.GetAvatarUrl() ?? user2.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+                string user1Url = (user1.GetAvatarUrl() ?? user1.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+                string user2Url = (user2.GetAvatarUrl() ?? user2.GetDefaultAvatarUrl()).Replace(".gif", ".png");
                 using HttpClient hc = new HttpClient();
-                byte[] jpgBytes = hc.GetByteArrayAsync($"https://nekobot.xyz/api/imagegen?user1={user1_url}&user2={user2_url}&type=whowouldwin&raw=1").GetAwaiter().GetResult();
+                byte[] jpgBytes = hc.GetByteArrayAsync($"https://nekobot.xyz/api/imagegen?user1={user1Url}&user2={user2Url}&type=whowouldwin&raw=1").GetAwaiter().GetResult();
                 return Task.FromResult(new MemoryStream(jpgBytes));
             }
             finally
@@ -230,7 +230,7 @@ namespace GLaDOSV3.Module.ImageGeneration
                 typing.Dispose();
             }
         }
-        public Task<MemoryStream> IPhoneX(ICommandContext context, string url)
+        public Task<MemoryStream> PhoneX(ICommandContext context, string url)
         {
             IDisposable typing = context.Channel.EnterTypingState();
             try

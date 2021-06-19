@@ -219,21 +219,21 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Remarks("iphonex [mention/userid/file]")]
         [Summary("Hmm what can we fit into iphonex screen this time?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task IPhoneX(IUser user = null)
+        public async Task PhoneX(IUser user = null)
         {
             if (user != null)
-                await Context.Channel.SendFileAsync(this._service.IPhoneX(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "iphone.jpg");
+                await Context.Channel.SendFileAsync(this._service.PhoneX(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "iphone.jpg");
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
 
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.IPhoneX(Context, attach.Url).GetAwaiter().GetResult(), "iphone.jpg");
+                    await Context.Channel.SendFileAsync(this._service.PhoneX(Context, attach.Url).GetAwaiter().GetResult(), "iphone.jpg");
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
             else
-                await Context.Channel.SendFileAsync(this._service.IPhoneX(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "iphone.jpg");
+                await Context.Channel.SendFileAsync(this._service.PhoneX(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "iphone.jpg");
         }
 
         [Command("trap", RunMode = RunMode.Async)]

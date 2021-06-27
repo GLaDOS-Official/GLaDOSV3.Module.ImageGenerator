@@ -10,6 +10,14 @@ namespace GLaDOSV3.Module.ImageGeneration
     {
         private readonly GeneratorService _service;
         private readonly string[] imageFormats = { "jpg", "jpeg", "bmp", "png" };
+
+        private readonly string[] patStrings = { "Pat pat!", "{mention} I heard that pats are great and healthy", "Pattu?" };
+        private readonly string[] hugStrings = { "Hey {mention}! You look like you could use a hug ❤", "Here {mention}, have a hug.", "Don't worry, I'm here", "Don't worry, you're not lonely" };
+        private readonly string[] cuddleStrings = { };
+        private readonly string[] kissStrings = { };
+        private readonly string[] slapStrings = { "{mention} the fuck did you say to me you little bitch?!", "Get slapped!", "No apologies..." };
+        private readonly string[] tickleStrings = { };
+        private readonly string[] pokeStrings = { };
         public ImageGeneratorModule(GeneratorService service) => this._service = service;
 
         private bool HasImageExtension(string path) => this.imageFormats.Any(path.EndsWith);
@@ -18,7 +26,7 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Remarks("delete")]
         [Summary("delete")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Delete([Remainder]string text)
+        public async Task Delete([Remainder] string text)
         {
             if (!this._service.Fail)
                 await Context.Channel.SendFileAsync(this._service.Delete(text, Context).GetAwaiter().GetResult(), "delet.jpg");
@@ -29,7 +37,7 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Remarks("shit <who>")]
         [Summary("shit")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Shit([Remainder]string text)
+        public async Task Shit([Remainder] string text)
         {
             if (!this._service.Fail)
                 await Context.Channel.SendFileAsync(this._service.Shit(text.Split(','), Context).GetAwaiter().GetResult(), "shit.jpg");
@@ -40,7 +48,7 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Remarks("mc <name>")]
         [Summary("Achievement get!")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Minecraft([Remainder]string text) => await Context.Channel.SendFileAsync(this._service.MinecraftAchivementGet(text, Context).GetAwaiter().GetResult(), "minecraft_bullshit.jpg");
+        public async Task Minecraft([Remainder] string text) => await Context.Channel.SendFileAsync(this._service.MinecraftAchivementGet(text, Context).GetAwaiter().GetResult(), "minecraft_bullshit.jpg");
         [Command("threats", RunMode = RunMode.Async)]
         [Remarks("threats [mention/userid/file]")]
         [Summary("The 3 biggest threats to society...")]
@@ -103,12 +111,12 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Remarks("clyde <clyde>")]
         [Summary("Clyde? What the are you saying again?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Clyde([Remainder]string clyde) => await Context.Channel.SendFileAsync(this._service.Clyde(Context, clyde).GetAwaiter().GetResult(), "clyde.jpg");
+        public async Task Clyde([Remainder] string clyde) => await Context.Channel.SendFileAsync(this._service.Clyde(Context, clyde).GetAwaiter().GetResult(), "clyde.jpg");
         [Command("relationship", RunMode = RunMode.Async)]
         [Remarks("relationship <userid/mention> [userid/mention]")]
         [Summary("OwO Who's that?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Relationship(IUser user, IUser user2 = null) => await Context.Channel.SendFileAsync(this._service.Relationship(Context,user, user2).GetAwaiter().GetResult(), "relationship.jpg");
+        public async Task Relationship(IUser user, IUser user2 = null) => await Context.Channel.SendFileAsync(this._service.Relationship(Context, user, user2).GetAwaiter().GetResult(), "relationship.jpg");
         [Command("captcha", RunMode = RunMode.Async)]
         [Remarks("captcha [mention/userid/file]")]
         [Summary("Please verify to continue...")]
@@ -133,13 +141,13 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Remarks("whowouldwin <userid/mention> [userid/mention]")]
         [Summary("Who would win?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task WhoWouldWin(IUser user, IUser user2 = null) => await Context.Channel.SendFileAsync(this._service.WhoWouldWin(Context,user, user2).GetAwaiter().GetResult(), "WhoWouldWin.jpg");
+        public async Task WhoWouldWin(IUser user, IUser user2 = null) => await Context.Channel.SendFileAsync(this._service.WhoWouldWin(Context, user, user2).GetAwaiter().GetResult(), "WhoWouldWin.jpg");
         [Command("changemymind", RunMode = RunMode.Async)]
         [Remarks("changemymind <text>")]
         [Summary("Change my mind bruh!")]
         [Timeout(5, 30, Measure.Seconds)]
         [Alias("cmm")]
-        public async Task ChangeMyMind([Remainder]string cmm) => await Context.Channel.SendFileAsync(this._service.ChangeMyMind(Context, cmm).GetAwaiter().GetResult(), "CMM.jpg");
+        public async Task ChangeMyMind([Remainder] string cmm) => await Context.Channel.SendFileAsync(this._service.ChangeMyMind(Context, cmm).GetAwaiter().GetResult(), "CMM.jpg");
         [Command("jpeg", RunMode = RunMode.Async)]
         [Remarks("jpeg  [mention/userid/file]")]
         [Summary("Jpegify")]
@@ -175,7 +183,7 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Summary("Kanna OwO")]
         [Timeout(5, 30, Measure.Seconds)]
         [Alias("kannagen")]
-        public async Task Kannagen([Remainder]string cmm) => await Context.Channel.SendFileAsync(this._service.Kannagen(Context, cmm).GetAwaiter().GetResult(), "Kanna.jpg");
+        public async Task Kannagen([Remainder] string cmm) => await Context.Channel.SendFileAsync(this._service.Kannagen(Context, cmm).GetAwaiter().GetResult(), "Kanna.jpg");
         [Command("pat", RunMode = RunMode.Async)]
         [Remarks("pat [user]")]
         [Summary("Pat someone for being cute :3")]
@@ -246,7 +254,7 @@ namespace GLaDOSV3.Module.ImageGeneration
         [Summary("New notification on twitter from realDonaldTrump!")]
         [Timeout(5, 30, Measure.Seconds)]
         [Alias("trumptweet")]
-        public async Task TrumpTweet([Remainder]string cmm) => await Context.Channel.SendFileAsync(this._service.Trump(Context, cmm).GetAwaiter().GetResult(), "realDonaldTrump.jpg");
+        public async Task TrumpTweet([Remainder] string cmm) => await Context.Channel.SendFileAsync(this._service.Trump(Context, cmm).GetAwaiter().GetResult(), "realDonaldTrump.jpg");
         [Command("deepfry", RunMode = RunMode.Async)]
         [Remarks("deepfry [mention/userid/file]")]
         [Summary("Did anyone said deepfry?")]

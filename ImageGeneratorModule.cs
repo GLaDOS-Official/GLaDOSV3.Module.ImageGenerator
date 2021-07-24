@@ -1,10 +1,10 @@
-﻿using Discord;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using GLaDOSV3.Attributes;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace GLaDOSV3.Module.ImageGeneration
+namespace GLaDOSV3.Module.ImageGenerator
 {
     public class ImageGeneratorModule : ModuleBase<ICommandContext>
     {

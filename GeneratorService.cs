@@ -1,8 +1,3 @@
-using Discord;
-using Discord.Commands;
-using GLaDOSV3.Services;
-using ImageMagick;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -10,8 +5,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using GLaDOSV3.Services;
+using ImageMagick;
+using Newtonsoft.Json.Linq;
 
-namespace GLaDOSV3.Module.ImageGeneration
+namespace GLaDOSV3.Module.ImageGenerator
 {
     public class GeneratorService
     {

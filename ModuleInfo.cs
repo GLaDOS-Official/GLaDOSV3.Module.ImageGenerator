@@ -1,12 +1,13 @@
-﻿using Discord.Commands;
-using Discord.WebSocket;
-using GLaDOSV3.Helpers;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.Loader;
+using Discord.Commands;
+using Discord.WebSocket;
+using GLaDOSV3.Helpers;
+using GLaDOSV3.Models.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GLaDOSV3.Module.ImageGeneration
+namespace GLaDOSV3.Module.ImageGenerator
 {
     public class ModuleInfo : IGladosModule
     {
@@ -18,7 +19,7 @@ namespace GLaDOSV3.Module.ImageGeneration
 
         public string Author() => "BlackOfWorld#8125";
 
-        public Type[] Services(DiscordSocketClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceCollection provider) => new[] { typeof(GeneratorService) };
+        public Type[] Services(DiscordShardedClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceCollection provider) => new[] { typeof(GeneratorService) };
         private static volatile ModuleInfo _singleton;
         public static IGladosModule GetModule()
         {
@@ -30,17 +31,17 @@ namespace GLaDOSV3.Module.ImageGeneration
             return _singleton;
         }
 
-        public void PreLoad(DiscordSocketClient discord, CommandService commands, BotSettingsHelper<string> config,
+        public void PreLoad(DiscordShardedClient discord, CommandService commands, BotSettingsHelper<string> config,
             IServiceProvider provider)
         { }
 
-        public void PostLoad(DiscordSocketClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceProvider provider)
+        public void PostLoad(DiscordShardedClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceProvider provider)
         { }
 
-        public void Reload(DiscordSocketClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceProvider provider)
+        public void Reload(DiscordShardedClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceProvider provider)
         { }
 
-        public void Unload(DiscordSocketClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceProvider provider)
+        public void Unload(DiscordShardedClient discord, CommandService commands, BotSettingsHelper<string> config, IServiceProvider provider)
         { }
 
         public static void OnPluginUnloadingRequested(AssemblyLoadContext obj)

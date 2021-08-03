@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyVersion>1.0.76.8</AssemblyVersion>
     <FileVersion>1.0.76.8</FileVersion>
     <LangVersion>latest</LangVersion>
@@ -28,8 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="7.24.1" />
-    <PackageReference Include="Magick.NET.Core" Version="7.0.1" />
+    <PackageReference Include="Magick.NET-Q16-HDRI-AnyCPU" Version="8.1.0" />
+    <PackageReference Include="Magick.NET.Core" Version="8.1.0" />
   </ItemGroup>
 
   <ItemGroup>

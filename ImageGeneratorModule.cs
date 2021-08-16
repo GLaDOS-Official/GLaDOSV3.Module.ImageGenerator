@@ -1,12 +1,13 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Discord;
 using Discord.Commands;
 using GLaDOSV3.Attributes;
 
 namespace GLaDOSV3.Module.ImageGenerator
 {
-    public class ImageGeneratorModule : ModuleBase<ICommandContext>
+    public class ImageGeneratorModule : ModuleBase<ShardedCommandContext>
     {
         private readonly GeneratorService _service;
         private readonly string[] imageFormats = { "jpg", "jpeg", "bmp", "png" };
@@ -48,26 +49,25 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Remarks("mc <name>")]
         [Summary("Achievement get!")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Minecraft([Remainder] string text) => await Context.Channel.SendFileAsync(this._service.MinecraftAchivementGet(text, Context).GetAwaiter().GetResult(), "minecraft_bullshit.jpg");
+        public async Task Minecraft([Remainder] string text) => await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/mc/Achievement+Get!/{text}");
         [Command("threats", RunMode = RunMode.Async)]
         [Remarks("threats [mention/userid/file]")]
         [Summary("The 3 biggest threats to society...")]
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Threats(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Threats(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "dangerous_person.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
-
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.Threats(Context, attach.Url).GetAwaiter().GetResult(), "dangerous_object.jpg");
+                    url = attach.Url;
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.Threats(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "dangerous_person.jpg");
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={(url.Replace(".gif", ".png"))}&type=threats");
         }
         [Command("beautiful", RunMode = RunMode.Async)]
         [Remarks("beautiful [mention/userid/file]")]
@@ -94,78 +94,104 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Baguette(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Baguette(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "baguette.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = (user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl());
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.Baguette(Context, attach.Url).GetAwaiter().GetResult(), "baguette.jpg");
+                    url = attach.Url;
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.Baguette(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "baguette.jpg");
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={(url.Replace(".gif", ".png"))}&type=baguette");
         }
         [Command("clyde", RunMode = RunMode.Async)]
         [Remarks("clyde <clyde>")]
         [Summary("Clyde? What the are you saying again?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Clyde([Remainder] string clyde) => await Context.Channel.SendFileAsync(this._service.Clyde(Context, clyde).GetAwaiter().GetResult(), "clyde.jpg");
+        public async Task Clyde([Remainder] string clyde) => await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?text={clyde}&type=clyde");
         [Command("relationship", RunMode = RunMode.Async)]
         [Remarks("relationship <userid/mention> [userid/mention]")]
         [Summary("OwO Who's that?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Relationship(IUser user, IUser user2 = null) => await Context.Channel.SendFileAsync(this._service.Relationship(Context, user, user2).GetAwaiter().GetResult(), "relationship.jpg");
+        public async Task Relationship(IUser user, IUser user2 = null)
+        {
+            if (user2 == null) user2 = Context.Client.CurrentUser;
+            var userUrl = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
+            var userUrl2 = ((user2.GetAvatarUrl() ?? user2.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
+
+            userUrl = this._service.FixUrl(userUrl);
+            userUrl2 = this._service.FixUrl(userUrl2);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?user1={userUrl}&user2={userUrl2}&type=ship");
+        }
         [Command("captcha", RunMode = RunMode.Async)]
         [Remarks("captcha [mention/userid/file]")]
         [Summary("Please verify to continue...")]
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Captcha(IUser user = null)
         {
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var username = HttpUtility.UrlEncode(Context.User.Username);
             if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Captcha(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl(), user.Username).GetAwaiter().GetResult(), "captcha.jpg");
+            {
+                url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png")); ;
+                username = HttpUtility.UrlEncode(user.Username);
+            }
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
 
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.Captcha(Context, attach.Url, System.IO.Path.GetFileNameWithoutExtension(attach.Filename)).GetAwaiter().GetResult(), "captcha.jpg");
+                {
+                    url = attach.Url;
+                    username = Path.GetFileNameWithoutExtension(attach.Filename);
+                }
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.Captcha(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl(), Context.User.Username).GetAwaiter().GetResult(), "captcha.jpg");
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={url}&username={username}&type=captcha");
         }
         [Command("whowouldwin", RunMode = RunMode.Async)]
         [Remarks("whowouldwin <userid/mention> [userid/mention]")]
         [Summary("Who would win?")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task WhoWouldWin(IUser user, IUser user2 = null) => await Context.Channel.SendFileAsync(this._service.WhoWouldWin(Context, user, user2).GetAwaiter().GetResult(), "WhoWouldWin.jpg");
+        public async Task WhoWouldWin(IUser user, IUser user2 = null)
+        {
+            if (user2 == null) user2 = Context.Client.CurrentUser;
+            var userUrl = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
+            var userUrl2 = ((user2.GetAvatarUrl() ?? user2.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
+
+            userUrl = this._service.FixUrl(userUrl);
+            userUrl2 = this._service.FixUrl(userUrl2);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?user1={(userUrl)}&user2={userUrl2}&type=whowouldwin");
+        }
         [Command("changemymind", RunMode = RunMode.Async)]
         [Remarks("changemymind <text>")]
         [Summary("Change my mind bruh!")]
         [Timeout(5, 30, Measure.Seconds)]
         [Alias("cmm")]
-        public async Task ChangeMyMind([Remainder] string cmm) => await Context.Channel.SendFileAsync(this._service.ChangeMyMind(Context, cmm).GetAwaiter().GetResult(), "CMM.jpg");
+        public async Task ChangeMyMind([Remainder] string cmm) => await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?text={(cmm.Length >= 100 ? cmm.Substring(0, 100) : cmm)}&type=changemymind");
         [Command("jpeg", RunMode = RunMode.Async)]
         [Remarks("jpeg  [mention/userid/file]")]
         [Summary("Jpegify")]
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Jpegify(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Jpegify(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "jpeg.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.Jpegify(Context, attach.Url).GetAwaiter().GetResult(), "jpeg.jpg");
+                    url = attach.Url;
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.Jpegify(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "jpeg.jpg");
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={url}&type=jpeg");
         }
         [Command("lolice", RunMode = RunMode.Async)]
         [Remarks("lolice  [mention/userid/file]")]
@@ -173,107 +199,148 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Lolice(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Lolice(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "lolice.jpg");
-            else
-                await Context.Channel.SendFileAsync(this._service.Lolice(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "lolice.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
+            else if (Context.Message.Attachments.Count > 0)
+            {
+                IAttachment attach = Context.Message.Attachments.First();
+                if (this.HasImageExtension(attach.Url))
+                    url = attach.Url;
+                else
+                    await this.ReplyAsync("The attachment is not an image!");
+            }
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={url}&type=lolice");
         }
         [Command("kannafy", RunMode = RunMode.Async)]
         [Remarks("kannafy <text>")]
         [Summary("Kanna OwO")]
         [Timeout(5, 30, Measure.Seconds)]
         [Alias("kannagen")]
-        public async Task Kannagen([Remainder] string cmm) => await Context.Channel.SendFileAsync(this._service.Kannagen(Context, cmm).GetAwaiter().GetResult(), "Kanna.jpg");
+        public async Task Kannagen([Remainder] string text)
+        {
+            const int splitPerChar = 10;
+            const int splitPerUpperChar = 8;
+            if (text.Length >= 45) text = text.Substring(0, 45);
+
+            string[] split = text.Split(' ');
+            for (int i = 0; i < split.Length; i++)
+            {
+                int splitNum = char.IsUpper(split[i][^1]) ? splitPerUpperChar : splitPerChar;
+                if (split[i].Length < splitNum) continue;
+                for (int j = splitNum; j < split[i].Length; j += splitNum) split[i] = split[i].Insert(j, " ");
+            }
+            string result = string.Join(' ', split);
+
+            Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?text={result}&type=kannagen").GetAwaiter().GetResult();
+        }
         [Command("pat", RunMode = RunMode.Async)]
         [Remarks("pat [user]")]
         [Summary("Pat someone for being cute :3")]
         [Alias("headpat", "pattu")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Pat(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Pat(Context).GetAwaiter().GetResult(), "pat.gif");
+        public async Task Pat(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Pat(Context));
         [Command("kiss", RunMode = RunMode.Async)]
         [Remarks("kiss [user]")]
         [Summary("Kiss someone you love 😘")]
         [Alias("kissu")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Kiss(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Kiss(Context).GetAwaiter().GetResult(), "kiss.gif");
+        public async Task Kiss(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Kiss(Context));
         [Command("tickle", RunMode = RunMode.Async)]
         [Remarks("tickle [user]")]
         [Summary("Tickle his funny bones 😏")]
         [Alias("tickly")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Tickle(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Tickle(Context).GetAwaiter().GetResult(), "tickle.gif");
+        public async Task Tickle(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Tickle(Context));
         [Command("poke", RunMode = RunMode.Async)]
         [Remarks("poke [user]")]
         [Summary("Hey you! I need your attention!")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Poke(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Poke(Context).GetAwaiter().GetResult(), "poke.gif");
+        public async Task Poke(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Poke(Context));
         [Command("slap", RunMode = RunMode.Async)]
         [Remarks("slap [user]")]
         [Summary("Slap them!")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Slap(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Slap(Context).GetAwaiter().GetResult(), "slap.gif");
+        public async Task Slap(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Slap(Context));
         [Command("cuddle", RunMode = RunMode.Async)]
         [Remarks("cuddle [user]")]
         [Summary("Cuddle with your waifu 😍")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Cuddle(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Cuddle(Context).GetAwaiter().GetResult(), "cuddle.gif");
+        public async Task Cuddle(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Cuddle(Context));
         [Command("hug", RunMode = RunMode.Async)]
         [Remarks("hug [user]")]
         [Summary("Hug someone who really needs it ❤🙌")]
         [Alias("huggu")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Hug(IUser user = null) => await Context.Channel.SendFileAsync(this._service.Hug(Context).GetAwaiter().GetResult(), "hug.gif");
+        public async Task Hug(IUser user = null) => await Context.Channel.SendMessageAsync(await this._service.Hug(Context));
         [Command("iphonex", RunMode = RunMode.Async)]
         [Remarks("iphonex [mention/userid/file]")]
         [Summary("Hmm what can we fit into iphonex screen this time?")]
         [Timeout(5, 30, Measure.Seconds)]
         public async Task PhoneX(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.PhoneX(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "iphone.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
-
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.PhoneX(Context, attach.Url).GetAwaiter().GetResult(), "iphone.jpg");
+                    url = attach.Url;
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.PhoneX(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "iphone.jpg");
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={(url)}&type=iphonex");
         }
 
         [Command("trap", RunMode = RunMode.Async)]
         [Remarks("trap [mention/userid]")]
         [Summary("Got you! Heheh")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Trap(IUser user) => await Context.Channel.SendFileAsync(this._service.Trap(Context, user).GetAwaiter().GetResult(), "trap.jpg");
+        public async Task Trap(IUser user) {
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
+            else if (Context.Message.Attachments.Count > 0)
+            {
+                IAttachment attach = Context.Message.Attachments.First();
+                if (this.HasImageExtension(attach.Url))
+                    url = attach.Url;
+                else
+                    await this.ReplyAsync("The attachment is not an image!");
+            }
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={url}&author={HttpUtility.UrlEncode(Context.User.Username)}&name={HttpUtility.UrlEncode(user.Username)}&type=trap");
+        }
         [Command("trump", RunMode = RunMode.Async)]
         [Remarks("trump <text>")]
         [Summary("New notification on twitter from realDonaldTrump!")]
         [Timeout(5, 30, Measure.Seconds)]
         [Alias("trumptweet")]
-        public async Task TrumpTweet([Remainder] string cmm) => await Context.Channel.SendFileAsync(this._service.Trump(Context, cmm).GetAwaiter().GetResult(), "realDonaldTrump.jpg");
+        public async Task TrumpTweet([Remainder] string trump)
+        {
+            if (trump.Length > 33) trump = trump.Insert(34, " ");
+            if (trump.Length >= 72) trump = trump.Substring(0, 72);
+
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?text={trump}&type=trumptweet");
+        }
         [Command("deepfry", RunMode = RunMode.Async)]
         [Remarks("deepfry [mention/userid/file]")]
         [Summary("Did anyone said deepfry?")]
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Deepfry(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Deepfry(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "Deepfry.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
-
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.Deepfry(Context, attach.Url).GetAwaiter().GetResult(), "Deepfry.jpg");
+                    url = attach.Url;
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.Deepfry(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "Deepfry.jpg");
+            url = this._service.FixUrl(url);
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?url={(url)}&type=deepfry");
         }
 
         [Command("magik", RunMode = RunMode.Async)]
@@ -282,19 +349,19 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Magik(IUser user = null)
         {
-            if (user != null)
-                await Context.Channel.SendFileAsync(this._service.Magik(Context, user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "Magik.jpg");
+            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png")); 
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
-
                 if (this.HasImageExtension(attach.Url))
-                    await Context.Channel.SendFileAsync(this._service.Magik(Context, attach.Url).GetAwaiter().GetResult(), "Magik.jpg");
+                    url = attach.Url;
                 else
                     await this.ReplyAsync("The attachment is not an image!");
             }
-            else
-                await Context.Channel.SendFileAsync(this._service.Magik(Context, Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).GetAwaiter().GetResult(), "Deepfry.jpg");
+            url = this._service.FixUrl(url);
+            Random rand = new Random();
+            await Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?image={(url.Replace(".gif", ".png"))}&type=magik&intensity={rand.Next(10)}");
         }
     }
 }

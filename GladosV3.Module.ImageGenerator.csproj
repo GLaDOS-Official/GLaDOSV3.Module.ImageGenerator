@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -56,5 +56,8 @@
     <Copy SourceFiles="Images\shit.html" DestinationFolder="..\GLaDOSV3\$(OutDir)\Images\"></Copy>
     <Copy SourceFiles="Images\delete.html" DestinationFolder="..\GLaDOSV3\$(OutDir)\Images\"></Copy>
     <Exec Command="start /MIN /WAIT /I /D &quot;$(ProjectDir)&quot; copy_runtime.bat &quot;..\GLaDOSV3\$(OutDir)runtimes&quot;" />
+  </Target>
+  <Target Condition="'$(Configuration)'=='DEBUG'" Name="DebugPostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb" DestinationFolder="..\GLaDOSV3\$(OutDir)\Modules"></Copy>
   </Target>
 </Project>

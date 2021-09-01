@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Discord;
@@ -56,7 +58,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Threats(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -94,7 +96,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Baguette(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = (user.GetAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl());
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -180,7 +182,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Jpegify(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -199,7 +201,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Lolice(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -223,14 +225,14 @@ namespace GLaDOSV3.Module.ImageGenerator
             const int splitPerUpperChar = 8;
             if (text.Length >= 45) text = text.Substring(0, 45);
 
-            string[] split = text.Split(' ');
-            for (int i = 0; i < split.Length; i++)
+            var split = text.Split(' ');
+            for (var i = 0; i < split.Length; i++)
             {
-                int splitNum = char.IsUpper(split[i][^1]) ? splitPerUpperChar : splitPerChar;
+                var splitNum = char.IsUpper(split[i][^1]) ? splitPerUpperChar : splitPerChar;
                 if (split[i].Length < splitNum) continue;
-                for (int j = splitNum; j < split[i].Length; j += splitNum) split[i] = split[i].Insert(j, " ");
+                for (var j = splitNum; j < split[i].Length; j += splitNum) split[i] = split[i].Insert(j, " ");
             }
-            string result = string.Join(' ', split);
+            var result = string.Join(' ', split);
 
             Context.Channel.SendMessageAsync($"https://cdn.blackofworld.fun/cat/?text={result}&type=kannagen").GetAwaiter().GetResult();
         }
@@ -279,7 +281,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task PhoneX(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -298,7 +300,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Summary("Got you! Heheh")]
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Trap(IUser user) {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -329,7 +331,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Deepfry(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
@@ -349,7 +351,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Timeout(5, 30, Measure.Seconds)]
         public async Task Magik(IUser user = null)
         {
-            string url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
+            var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png")); 
             else if (Context.Message.Attachments.Count > 0)
             {

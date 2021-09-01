@@ -33,9 +33,9 @@ namespace GLaDOSV3.Module.ImageGenerator
             IDisposable typing = context.Channel.EnterTypingState();
             try
             {
-                string item = items.Aggregate(string.Empty, (current, type) => current + type + ", ");
-                string html = File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(),
-                    $"images{Path.DirectorySeparatorChar}shit.html")).GetAwaiter().GetResult().Replace("REPLACEWITHITEM", item.Remove(item.Length - 2)).Replace("REPLACECORRECTPLURAL", items.Length > 1 ? "are" : "is");
+                var item = items.Aggregate(string.Empty, (current, type) => current + type + ", ");
+                var html = File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(),
+                                                              $"images{Path.DirectorySeparatorChar}shit.html")).GetAwaiter().GetResult().Replace("REPLACEWITHITEM", item.Remove(item.Length - 2)).Replace("REPLACECORRECTPLURAL", items.Length > 1 ? "are" : "is");
                 var jpgBytes = Exec(html).GetAwaiter().GetResult();
                 return Task.FromResult(new MemoryStream(jpgBytes));
             }
@@ -49,8 +49,8 @@ namespace GLaDOSV3.Module.ImageGenerator
             IDisposable typing = context.Channel.EnterTypingState();
             try
             {
-                string html = File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(),
-                    $"images{Path.DirectorySeparatorChar}delete.html")).GetAwaiter().GetResult().Replace("REPLACEWITHITEM", item);
+                var html = File.ReadAllTextAsync(Path.Combine(Directory.GetCurrentDirectory(),
+                                                              $"images{Path.DirectorySeparatorChar}delete.html")).GetAwaiter().GetResult().Replace("REPLACEWITHITEM", item);
                 var jpgBytes = Exec(html).GetAwaiter().GetResult();
                 return Task.FromResult(new MemoryStream(jpgBytes));
             }
@@ -203,7 +203,7 @@ namespace GLaDOSV3.Module.ImageGenerator
             });
             await using (StreamWriter stream = e.StandardInput)
             {
-                byte[] htmlcontent = Encoding.UTF8.GetBytes(html);
+                var htmlcontent = Encoding.UTF8.GetBytes(html);
                 await stream.BaseStream.WriteAsync(htmlcontent, 0, htmlcontent.Length).ConfigureAwait(false);
                 await stream.WriteLineAsync().ConfigureAwait(false);
                 await stream.BaseStream.FlushAsync().ConfigureAwait(false);

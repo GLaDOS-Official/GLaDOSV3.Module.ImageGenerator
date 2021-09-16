@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using System.Runtime.Loader;
 using Discord.Commands;
 using Discord.WebSocket;
 using GLaDOSV3.Helpers;

@@ -1,3 +1,7 @@
+using Discord.Commands;
+using ImageMagick;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -5,11 +9,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Discord;
-using Discord.Commands;
-using GLaDOSV3.Services;
-using ImageMagick;
-using Newtonsoft.Json.Linq;
 
 namespace GLaDOSV3.Module.ImageGenerator
 {
@@ -17,10 +16,13 @@ namespace GLaDOSV3.Module.ImageGenerator
     {
         public bool Fail;
         private const string HtmlSplit = " ";
-        public GeneratorService()
+        public GeneratorService(ILogger<GeneratorService> logger)
         {
-            if (!OperatingSystem.IsWindows())  {this.Fail = false; return;}
-            if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Binaries{Path.DirectorySeparatorChar}wkhtmltoimage.exe"))) { LoggingService.Log(LogSeverity.Error, "ImageGenerator", "wkhtmltoimage.exe not found!"); this.Fail = true; };
+            if (!OperatingSystem.IsWindows()) { this.Fail = false; return; }
+            if (!File.Exists(Path.Combine(Directory.GetCurrentDirectory(), $"Binaries{Path.DirectorySeparatorChar}wkhtmltoimage.exe")))
+            {
+                logger.LogError("wkhtmltoimage.exe not found!"); this.Fail = true;
+            };
         }
         public string FixUrl(string url)
         {
@@ -64,7 +66,7 @@ namespace GLaDOSV3.Module.ImageGenerator
             IDisposable typing = context.Channel.EnterTypingState();
             try
             {
-                using var images = new MagickImageCollection();
+                using MagickImageCollection images = new MagickImageCollection();
                 using HttpClient hc = new HttpClient();
                 MagickImage image1 = new MagickImage($".{Path.DirectorySeparatorChar}Images{Path.DirectorySeparatorChar}beautiful.png");
                 MagickImage image2 = new MagickImage(hc.GetByteArrayAsync(url.Replace(".gif", ".png")).GetAwaiter().GetResult());
@@ -78,8 +80,8 @@ namespace GLaDOSV3.Module.ImageGenerator
                 images.Add(image3);
                 images.Add(image2);
                 images.Add(image1);
-                var result = images.Merge();
-                using var stream = new MemoryStream();
+                IMagickImage<float> result = images.Merge();
+                using MemoryStream stream = new MemoryStream();
                 result.Write(stream);
                 byte[] bytes;
                 bytes = stream.ToArray();
@@ -193,7 +195,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         }
         public static async Task<byte[]> Exec(string html, int width = 0, int height = 0) // Custom wrapper!!!
         {
-            var e = Process.Start(new ProcessStartInfo
+            Process e = Process.Start(new ProcessStartInfo
             {
                 Arguments = $"-q --width {width} --height {height} -f jpeg  - -",
                 FileName = Path.Combine(Directory.GetCurrentDirectory(),

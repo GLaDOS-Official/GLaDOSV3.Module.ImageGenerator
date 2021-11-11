@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Discord;
+using Discord.Commands;
+using GLaDOSV3.Attributes;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
-using Discord;
-using Discord.Commands;
-using GLaDOSV3.Attributes;
 
 namespace GLaDOSV3.Module.ImageGenerator
 {
@@ -299,7 +299,8 @@ namespace GLaDOSV3.Module.ImageGenerator
         [Remarks("trap [mention/userid]")]
         [Summary("Got you! Heheh")]
         [Timeout(5, 30, Measure.Seconds)]
-        public async Task Trap(IUser user) {
+        public async Task Trap(IUser user)
+        {
             var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
             if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
@@ -352,7 +353,7 @@ namespace GLaDOSV3.Module.ImageGenerator
         public async Task Magik(IUser user = null)
         {
             var url = (Context.User.GetAvatarUrl(size: 1024) ?? Context.User.GetDefaultAvatarUrl()).Replace(".gif", ".png");
-            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png")); 
+            if (user != null) url = ((user.GetAvatarUrl() ?? user.GetDefaultAvatarUrl()).Replace(".gif", ".png"));
             else if (Context.Message.Attachments.Count > 0)
             {
                 IAttachment attach = Context.Message.Attachments.First();
